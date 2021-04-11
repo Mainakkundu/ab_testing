@@ -1,12 +1,13 @@
-FROM python:3-onbuild
-RUN apt-get update && \
-    apt-get -yq install gcc
+FROM python:3.7
 
-COPY . /root/ab_testing
-WORKDIR /root/ab_testing
-COPY requirements.txt requirements.txt
+RUN pip install virtualenv
+ENV VIRTUAL_ENV=/venv
+RUN virtualenv venv -p python3
+ENV PATH="VIRTUAL_ENV/bin:$PATH"
 
-RUN chmod +x boot.sh
+WORKDIR /app
+ADD . /app
+RUN pip install -r requirements.txt
 
-EXPOSE 12500
-CMD ["/root/ab_testing/boot.sh"]
+ENV PORT 8080
+CMD ["gunicorn", "app:app", "--config=config.py"]
