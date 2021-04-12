@@ -104,7 +104,50 @@ def metric_data_prep(df_merg,KPI_original='tot_bask_spend',primary_key='card_cod
 
 
 
+def r2(x, y):
+    '''
+    >>> Stronger the relationship high the R-square
+    '''
+    return stats.pearsonr(x, y)[0] ** 2
 
+def CUPED(df,KPI):
+    '''
+    >>> Microsoft's classical approcah to reduce the variance and increase the power
+    'https://frankhopkins.github.io/py_ab_fh/5_Variance_Reduction_Methods.html'
+    '''
+    pre_experiment_KPI = KPI+'_pre_experiment'
+    covariance = np.cov(df[KPI], df[pre_experiment_KPI])
+    variance = np.cov(df[pre_experiment_KPI])
+    theta_calc = covariance / variance
+    theta_calc_reshape = theta_calc.reshape(4,1)
+    theta = theta_calc_reshape[1]
+    print(theta)
+    df['CUPED-adjusted_metric'] = df[KPI] - (df[pre_experiment_KPI] - statistics.mean(df[pre_experiment_KPI])) * theta
+
+    std_pvs = statistics.stdev(df[KPI])
+    std_CUPED = statistics.stdev(df['CUPED-adjusted_metric'])
+    mean_pvs = statistics.mean(df[KPI])
+    mean_CUPED = statistics.mean(df['CUPED-adjusted_metric'])
+
+    relative_pvs = std_pvs / mean_pvs
+    relative_cuped = std_CUPED / mean_CUPED
+    relative_diff = (relative_cuped - relative_pvs) / relative_pvs
+
+    print("The mean of the KPI  is %s."
+    % round(mean_pvs,4),
+    "The mean of the CUPED-adjusted KPI is % s."
+    % round(mean_CUPED,4))
+
+
+    print ("The standard deviation of KPI is % s."
+        % round(std_pvs,4),
+          "The standard deviation of the CUPED-adjusted KPI is % s."
+           % round(std_CUPED,4))
+
+    print("The relative reduction in standard deviation was % s"
+        % round(relative_diff*100,5),"%",)
+
+    return df
 
 
 
