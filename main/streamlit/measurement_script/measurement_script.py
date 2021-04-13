@@ -153,9 +153,6 @@ def CUPED(df,KPI):
 
 
 def t_distribution_ci(df,metric='post_sales_temp',control='Control',test='Test_1',test_flag = 'test_flag',alpha=0.05):
-    '''
-    >>> T-Test with unequal variance
-    '''
 
   signi = []
   p_value = []
