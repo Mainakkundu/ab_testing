@@ -397,3 +397,48 @@ elif choice=='Stat Base Measurement':
         st.subheader('Causal Inference statistical output')
         st.write(ci.summary(output='report'))
         st.dataframe(pre_post_report)
+    elif METHOD =='CUPED':
+        cup_df =CUPED(cup_df,KPI=METRIC)
+        test_cuped = cup_df[cup_df['test_flag']=='Test']
+        control_cuped = cup_df[cup_df['test_flag']=='Test']
+        cup_r = t_distribution_ci(cup_df,metric='CUPED-adjusted_metric',control='Control',test='Test',alpha=0.05)
+        cor_df = cup_r.corr()
+        st.subheader('Pre Vs Post Correlation to understand Variance')
+        sns.jointplot(cup_df[METRIC],cup_df[METRIC+'_pre_experiment'],kind="reg",stat_func=r2)
+        st.pyplot()
+        ax1 = sns.distplot(test_cuped['CUPED-adjusted_metric'],hist=False,kde=True)
+        ax2 = sns.distplot(control_cuped['CUPED-adjusted_metric'],hist=False,kde=True)
+        plt.axvline(np.mean(test_cuped['CUPED-adjusted_metric']), color='b', linestyle='dashed', label='TEST',linewidth=5)
+        plt.axvline(np.mean(control_cuped['CUPED-adjusted_metric']), color='orange', linestyle='dashed',label='CONTROL', linewidth=5)
+        plt.legend(labels=['TEST','CONTROL'])
+        st.subheader('CUPED-Distribution Comparison(Density Plot) after removing variance')
+        st.pyplot()
+        st.subheader('CUPED-Mean comparison between Test & Control Distribution using Welsh T-Test after removing variance')
+        st.dataframe(cup_r)
+    elif METHOD == 'Post (Control) Vs Post (Test) NonParametric':
+        print('---Step-1:Distribution Plot---')
+        plt.figure()
+        ax1 = sns.distplot(test[METRIC],hist=False,kde=True)
+        ax2 = sns.distplot(cntrol[METRIC],hist=False,kde=True)
+        plt.axvline(np.mean(test[METRIC]), color='b', linestyle='dashed', label='TEST',linewidth=5)
+        plt.axvline(np.mean(cntrol[METRIC]), color='orange', linestyle='dashed',label='CONTROL', linewidth=5)
+        plt.legend(labels=['TEST','CONTROL'])
+        st.subheader('Distribution Comparison(Density Plot)')
+        st.pyplot()
+        sns.boxplot(data=[test[METRIC],cntrol[METRIC]],showmeans=True)
+        st.subheader('Distribution Comparison(Box Plot)')
+        st.pyplot()
+        print('--Step-2:T-Test for Mean Comparison--')
+        st.subheader('Mean comparison between Test & Control Distribution using Welsh T-Test')
+        r = mann_whitney_u_test(df,metric=METRIC,control='Control',test='Test',test_flag='test_flag',alpha=0.05)
+        st.dataframe(r)
+        if r['p-value'].iloc[0] > 0.1:
+            st.markdown('''### Inference ''')
+            st.write('''According to the null hypothesis, there is no difference between the means.
+    The plot above shows the distribution of the difference of the means that
+    we would expect under the null hypothesis.''')
+        else:
+            st.markdown('''### Inference ''')
+            st.write('''According to the null hypothesis, there is siginificant difference between the means.
+    The plot above shows the distribution of the difference of the means that
+    we would expect under the null hypothesis.''')
