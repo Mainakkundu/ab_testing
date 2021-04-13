@@ -395,4 +395,5 @@ elif choice=='Stat Base Measurement':
         ci.plot()
         st.pyplot()
         st.subheader('Causal Inference statistical output')
-        
+        st.write(ci.summary(output='report'))
+        st.dataframe(pre_post_report)
