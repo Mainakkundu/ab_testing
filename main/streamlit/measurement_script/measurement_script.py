@@ -9,7 +9,7 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 import os
 from statsmodels.tsa.arima_process import ArmaProcess
 from causalimpact import CausalImpact
-
+from scipy import stats
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
@@ -25,6 +25,7 @@ from scipy import stats as sc
 from causalimpact import CausalImpact
 from statsmodels.formula.api import ols
 from PIL import Image
+import statistics
 warnings.filterwarnings("ignore")
 rcParams['figure.figsize'] = 20,10
 rcParams['font.size'] = 30
@@ -351,18 +352,18 @@ if choice == 'Sample-Size-Estimation':
     st.pyplot()
 elif choice=='Stat Base Measurement':
     METRIC  = st.sidebar.selectbox('Choose the metric', ['Pvs_per_session'])
-    METHOD = st.sidebar.selectbox('Choose the method', ['Post (Control) Vs Post (Test)','Pre (Test) Vs Post(Test)','CUPED_linear','Post (Control) Vs Post (Test) NonParametric'])
+    METHOD = st.sidebar.selectbox('Choose the method', ['Post (Control) Vs Post (Test)','Pre (Test) Vs Post(Test)','CUPED','Post (Control) Vs Post (Test) NonParametric'])
     if METHOD == 'Post (Control) Vs Post (Test)':
         print('---Step-1:Distribution Plot---')
         plt.figure()
         ax1 = sns.distplot(test[METRIC],hist=False,kde=True)
-        ax2 = sns.distplot(cntrol[METRIC],hist=False,kde=True)
+        ax2 = sns.distplot(control[METRIC],hist=False,kde=True)
         plt.axvline(np.mean(test[METRIC]), color='b', linestyle='dashed', label='TEST',linewidth=5)
-        plt.axvline(np.mean(cntrol[METRIC]), color='orange', linestyle='dashed',label='CONTROL', linewidth=5)
+        plt.axvline(np.mean(control[METRIC]), color='orange', linestyle='dashed',label='CONTROL', linewidth=5)
         plt.legend(labels=['TEST','CONTROL'])
         st.subheader('Distribution Comparison(Density Plot)')
         st.pyplot()
-        sns.boxplot(data=[test[METRIC],cntrol[METRIC]],showmeans=True)
+        sns.boxplot(data=[test[METRIC],control[METRIC]],showmeans=True)
         st.subheader('Distribution Comparison(Box Plot)')
         st.pyplot()
         print('--Step-2:T-Test for Mean Comparison--')
@@ -397,7 +398,7 @@ elif choice=='Stat Base Measurement':
     elif METHOD =='CUPED':
         cup_df =CUPED(cup_df,KPI=METRIC)
         test_cuped = cup_df[cup_df['test_flag']=='Test']
-        control_cuped = cup_df[cup_df['test_flag']=='Test']
+        control_cuped = cup_df[cup_df['test_flag']=='Control']
         cup_r = t_distribution_ci(cup_df,metric='CUPED-adjusted_metric',control='Control',test='Test',alpha=0.05)
         cor_df = cup_r.corr()
         st.subheader('Pre Vs Post Correlation to understand Variance')
@@ -416,13 +417,13 @@ elif choice=='Stat Base Measurement':
         print('---Step-1:Distribution Plot---')
         plt.figure()
         ax1 = sns.distplot(test[METRIC],hist=False,kde=True)
-        ax2 = sns.distplot(cntrol[METRIC],hist=False,kde=True)
+        ax2 = sns.distplot([METRIC],hist=False,kde=True)
         plt.axvline(np.mean(test[METRIC]), color='b', linestyle='dashed', label='TEST',linewidth=5)
-        plt.axvline(np.mean(cntrol[METRIC]), color='orange', linestyle='dashed',label='CONTROL', linewidth=5)
+        plt.axvline(np.mean([METRIC]), color='orange', linestyle='dashed',label='CONTROL', linewidth=5)
         plt.legend(labels=['TEST','CONTROL'])
         st.subheader('Distribution Comparison(Density Plot)')
         st.pyplot()
-        sns.boxplot(data=[test[METRIC],cntrol[METRIC]],showmeans=True)
+        sns.boxplot(data=[test[METRIC],[METRIC]],showmeans=True)
         st.subheader('Distribution Comparison(Box Plot)')
         st.pyplot()
         print('--Step-2:T-Test for Mean Comparison--')
