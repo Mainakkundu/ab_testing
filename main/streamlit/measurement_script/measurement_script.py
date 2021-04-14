@@ -1,4 +1,3 @@
-print('--------Imports --------')
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -31,13 +30,6 @@ rcParams['figure.figsize'] = 20,10
 rcParams['font.size'] = 30
 sns.set()
 np.random.seed(8)
-print('----------------------------')
-
-os.chdir('/Users/maikundu/Desktop/My_Learning/MediumBlog/AB_test_app')
-
-print('===============================================')
-print('----------- Utility Functions -----------------')
-print('===============================================')
 
 def min_detectable_data_prep(base_mean,base_std,min_detectable_change):
   '''
@@ -56,7 +48,7 @@ def min_detectable_data_prep(base_mean,base_std,min_detectable_change):
     fd['detectable_effect'] = [i]
     fd['mu_hat'] = [mu]
     df_f = df_f.append(fd)
-  return (df_f)
+    return (df_f)
 
 def sample_size_calculator(mu_base,mu_hat,std_base,alpha=0.05,power=0.8):
     '''
@@ -285,24 +277,16 @@ def mann_whitney_u_test(df,metric='pos_sales_temp',control='Control',test='Test'
 
     return test_summary2
 
-
-
-print('===============================================')
-print('----------- Application Run--------------------')
-print('===============================================')
-
-st.title("""
-         AB-Testing Tool """)
+st.title("""AB-Testing Tool """)
 html_temp = """
 <div style="background-color:orange;padding:10px">
 <h2 style="color:black;text-align:center;">Online Marketing Campaigns</h2>
 </div>
 """
-os.chdir('/Users/maikundu/Desktop/git/ab_testing/main/streamlit/data')
 
 print('----Data Imports ------')
-df = pd.read_csv('fake_data.csv') ###1
-cup_df = pd.read_csv('fake_data_cuped.csv') ###2
+df = pd.read_csv('./main/streamlit/data/fake_data.csv') ###1
+cup_df = pd.read_csv('./main/streamlit/data/fake_data_cuped.csv') ###2
 
 test_f = {'Control_Matrix':'Control', 'Variant_BT':'Test'}
 
