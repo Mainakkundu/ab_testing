@@ -10,4 +10,4 @@ ADD . /app
 RUN pip install -r requirements.txt
 
 ENV PORT 8080
-CMD ["gunicorn", "app:app", "--config=config.py"]
+CMD streamlit run --server.port 8080 --server.enableCORS false app.py
