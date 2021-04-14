@@ -428,6 +428,7 @@ elif choice=='Stat Base Measurement':
         st.pyplot()
         print('--Step-2:T-Test for Mean Comparison--')
         st.subheader('Mean comparison between Test & Control Distribution using Welsh T-Test')
+        df[METRIC] = df[METRIC].astype('float')
         r = mann_whitney_u_test(df,metric=METRIC,control='Control',test='Test',test_flag='test_flag',alpha=0.05)
         st.dataframe(r)
         if r['p-value'].iloc[0] > 0.1:
